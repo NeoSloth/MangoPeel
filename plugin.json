@@ -6,6 +6,6 @@
   "publish": {
     "tags": ["mangoapp","mangohud"],
     "description": "A decky plugin for custom performance monitoring style.",
-    "image": "https://raw.githubusercontent.com/Gawah/MangoPeel/main/assets/decky_loader_plugin_image.png"
+    "image": "https://raw.githubusercontent.com/NeoSloth/MangoPeel/main/assets/decky_loader_plugin_image.png"
   }
 }

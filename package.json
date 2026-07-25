@@ -1,6 +1,6 @@
 {
   "name": "MangoPeel",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "A decky plugin for custom performance monitoring style.",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gawah/MangoPeel.git"
+    "url": "git+https://github.com/NeoSloth/MangoPeel.git"
   },
   "keywords": [
     "decky",
@@ -21,11 +21,14 @@
     "mangoapp"
   ],
   "author": "yxx",
+  "contributors": [
+    "NeoSloth"
+  ],
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/Gawah/MangoPeel/issues"
+    "url": "https://github.com/NeoSloth/MangoPeel/issues"
   },
-  "homepage": "https://github.com/Gawah/MangoPeel#readme",
+  "homepage": "https://github.com/NeoSloth/MangoPeel#readme",
   "devDependencies": {
     "@decky/rollup": "^1.0.2",
     "@decky/ui": "^4.11.0",
