@@ -820,6 +820,25 @@ export const paramList:{ [paramName: string]: ParamData }={
       patchs: []
   },
 
+  [ParamName.fps_text] : {
+    name: ParamName.fps_text,
+    group: ParamGroup.FPS,
+    preCondition: [{
+      enable: [ParamName.fps],
+      disable: [ParamName.fps_only, ParamName.no_display, ParamName.preset]
+    }],
+    toggle: {
+      label: localizeStrEnum.FPS_TEXT_LABEL,
+      description: localizeStrEnum.FPS_TEXT_DESCRIPTION,
+      defaultEnable: false,
+    },
+    patchs: [{
+      type: ParamPatchType.textInput,
+      args: [],
+      defaultValue: "FPS",
+    }]
+  },
+
   [ParamName.frametime] : {
     name: ParamName.frametime,
     group: ParamGroup.FPS,

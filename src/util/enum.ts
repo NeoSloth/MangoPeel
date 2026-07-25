@@ -36,6 +36,7 @@ export enum ParamName {
   procmem_virt="procmem_virt",
   position = "position",
   fps = "fps",
+  fps_text = "fps_text",
   fps_only = "fps_only",
   fps_color_change = "fps_color_change",
   fan = "fan",

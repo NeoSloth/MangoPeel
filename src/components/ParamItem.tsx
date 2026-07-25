@@ -55,11 +55,14 @@ const ParamPatchItem: FC<{ paramName: ParamName, patch: ParamPatch; patchIndex: 
           </PanelSectionRow>
           <style>
             {
-              //缩短滑动条
+              // スライダーを親コンテナの幅に収める
               `#MangoPeel_Slider
-              .gamepaddialog_Field_S-_La.gamepaddialog_ChildrenWidthFixed_1ugIU 
+              .gamepaddialog_Field_S-_La.gamepaddialog_ChildrenWidthFixed_1ugIU
               .gamepaddialog_FieldChildrenWithIcon_2ZQ9w{
-                min-width: 215px!important;
+                min-width: 0!important;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
               } `
             }
             {

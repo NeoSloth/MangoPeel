@@ -820,6 +820,25 @@ export const paramList:{ [paramName: string]: ParamData }={
       patchs: []
   },
 
+  [ParamName.fps_text] : {
+    name: ParamName.fps_text,
+    group: ParamGroup.FPS,
+    preCondition: [{
+      enable: [ParamName.fps],
+      disable: [ParamName.fps_only, ParamName.no_display, ParamName.preset]
+    }],
+    toggle: {
+      label: localizeStrEnum.FPS_TEXT_LABEL,
+      description: localizeStrEnum.FPS_TEXT_DESCRIPTION,
+      defaultEnable: false,
+    },
+    patchs: [{
+      type: ParamPatchType.textInput,
+      args: [],
+      defaultValue: "FPS",
+    }]
+  },
+
   [ParamName.frametime] : {
     name: ParamName.frametime,
     group: ParamGroup.FPS,
@@ -1639,21 +1658,22 @@ export const paramOrder:{[paramName:string]:number} = {
   [ParamName.hdr]:16,
   [ParamName.refresh_rate]:17,
   [ParamName.fps]:18,
-  [ParamName.frame_timing]:19,
-  [ParamName.frame_count]:20,
-  [ParamName.debug]:21,
-  [ParamName.arch]:22,
-  [ParamName.engine_version]:23,
-  [ParamName.gamemode]:24,
-  [ParamName.vkbasalt]:25,
-  [ParamName.show_fps_limit]:26,
-  [ParamName.resolution]:27,
-  [ParamName.graphs_cpu_load]:28,
-  [ParamName.graphs_cpu_temp]:29,
-  [ParamName.graphs_gpu_core_clock]:30,
-  [ParamName.graphs_gpu_load]:31,
-  [ParamName.graphs_gpu_mem_clock]:32,
-  [ParamName.graphs_gpu_temp]:33,
-  [ParamName.graphs_ram]:34,
-  [ParamName.graphs_vram]:35,
+  [ParamName.fps_metrics]:19,
+  [ParamName.frame_timing]:20,
+  [ParamName.frame_count]:21,
+  [ParamName.debug]:22,
+  [ParamName.arch]:23,
+  [ParamName.engine_version]:24,
+  [ParamName.gamemode]:25,
+  [ParamName.vkbasalt]:26,
+  [ParamName.show_fps_limit]:27,
+  [ParamName.resolution]:28,
+  [ParamName.graphs_cpu_load]:29,
+  [ParamName.graphs_cpu_temp]:30,
+  [ParamName.graphs_gpu_core_clock]:31,
+  [ParamName.graphs_gpu_load]:32,
+  [ParamName.graphs_gpu_mem_clock]:33,
+  [ParamName.graphs_gpu_temp]:34,
+  [ParamName.graphs_ram]:35,
+  [ParamName.graphs_vram]:36,
 }

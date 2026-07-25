@@ -78,6 +78,8 @@
     "FSR_DESCRIPTION":"Display current FSR status",
     "FPS_LABEL":"Fps",
     "FPS_DESCRIPTION":"Display current frame rate.",
+    "FPS_TEXT_LABEL":"FPS Text",
+    "FPS_TEXT_DESCRIPTION":"Override FPS text",
     "FPS_COLOR_CHANGE_LABEL":"Fps Color Change",
     "FPS_COLOR_CHANGE_DESCRIPTION":"Frame rate text color changes with frame rate variation.",
     "FRAME_TIMING_LABEL":"Frame Timing",
