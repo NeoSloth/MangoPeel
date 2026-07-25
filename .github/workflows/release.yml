@@ -40,30 +40,26 @@ jobs:
           pnpm install --no-frozen-lockfile
           pnpm update @decky/ui --latest
           pnpm update @decky/api --latest
-          pnpm run build
-
-          rm -f dist/*.js.map
-
-          mkdir -p MangoPeel
-          cp -r dist *.py *.json *.md *.js LICENSE MangoPeel
-          tar -czvf MangoPeel.tar.gz MangoPeel
-
-          # zip
-          zip -r MangoPeel.zip MangoPeel
-          rm -rf MangoPeel
+          npm run package
       
-      - name: show files
+      - name: show and verify files
         run: |
-          tar -tzvf MangoPeel.tar.gz
-          unzip -l MangoPeel.zip
-          
+          tar -tzvf MangoPeel-Neo.tar.gz
+          unzip -l MangoPeel-Neo.zip
+          tar -tzf MangoPeel-Neo.tar.gz | grep -qx 'mangopeel_neo/dist/index.js'
+          unzip -Z1 MangoPeel-Neo.zip | grep -qx 'mangopeel_neo/dist/index.js'
+          if unzip -Z1 MangoPeel-Neo.zip | grep -q '\.js\.map$'; then
+            echo 'Source maps must not be included in the release package.' >&2
+            exit 1
+          fi
+
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: MangoPeel
+          name: MangoPeel-Neo
           path: |
-            MangoPeel.tar.gz
-            MangoPeel.zip
+            MangoPeel-Neo.tar.gz
+            MangoPeel-Neo.zip
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -83,8 +79,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            /tmp/artifacts/MangoPeel/MangoPeel.tar.gz
-            /tmp/artifacts/MangoPeel/MangoPeel.zip
+            /tmp/artifacts/MangoPeel-Neo/MangoPeel-Neo.tar.gz
+            /tmp/artifacts/MangoPeel-Neo/MangoPeel-Neo.zip
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           draft: false

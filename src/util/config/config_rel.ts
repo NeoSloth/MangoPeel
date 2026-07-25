@@ -274,7 +274,7 @@ export const paramList:{ [paramName: string]: ParamData }={
       patchs: [{
         type: ParamPatchType.textInput,
         args: [],
-        defaultValue: "MangoPeel",
+        defaultValue: "MangoPeel Neo",
       }]
   },
 
