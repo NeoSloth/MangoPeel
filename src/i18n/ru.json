@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "Слева сверху",
+    "POSITION_TOP_CENTER": "Сверху по центру",
+    "POSITION_TOP_RIGHT": "Справа сверху",
+    "POSITION_MIDDLE_LEFT": "Слева по центру",
+    "POSITION_MIDDLE_RIGHT": "Справа по центру",
+    "POSITION_BOTTOM_LEFT": "Слева снизу",
+    "POSITION_BOTTOM_CENTER": "Снизу по центру",
+    "POSITION_BOTTOM_RIGHT": "Справа снизу"
+}

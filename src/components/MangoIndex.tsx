@@ -56,6 +56,14 @@ export const MangoIndex: FC = () => {
             />
           </PanelSectionRow>
           </div>
+          <style>
+            {
+              // 値ラベルは残し、SteamOS風にノッチの縦棒だけを非表示にする。
+              `#MangoPeel_IndexSlider [class*="SliderNotchTick"] {
+                display: none;
+              }`
+            }
+          </style>
           <PanelSectionRow>
           <ToggleField
             label={LocalizationManager.getString(localizeStrEnum.USE_PERAPP_CONFIG_LABEL)}

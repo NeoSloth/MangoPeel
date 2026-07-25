@@ -194,4 +194,13 @@
     "GPU_VOLTAGE_LABEL" : "GPU Voltage",
     "GPU_VOLTAGE_DESCRIPTION" : "Display the voltage of the GPU",
     "RESET_ALL_PARAM_DEFAULT":"Reset all configurations"
+,
+    "POSITION_TOP_LEFT": "Top Left",
+    "POSITION_TOP_CENTER": "Top Center",
+    "POSITION_TOP_RIGHT": "Top Right",
+    "POSITION_MIDDLE_LEFT": "Middle Left",
+    "POSITION_MIDDLE_RIGHT": "Middle Right",
+    "POSITION_BOTTOM_LEFT": "Bottom Left",
+    "POSITION_BOTTOM_CENTER": "Bottom Center",
+    "POSITION_BOTTOM_RIGHT": "Bottom Right"
 }

@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "En haut à gauche",
+    "POSITION_TOP_CENTER": "En haut au centre",
+    "POSITION_TOP_RIGHT": "En haut à droite",
+    "POSITION_MIDDLE_LEFT": "Au milieu à gauche",
+    "POSITION_MIDDLE_RIGHT": "Au milieu à droite",
+    "POSITION_BOTTOM_LEFT": "En bas à gauche",
+    "POSITION_BOTTOM_CENTER": "En bas au centre",
+    "POSITION_BOTTOM_RIGHT": "En bas à droite"
+}

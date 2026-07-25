@@ -694,6 +694,22 @@ export class Settings {
     }
   }
 
+  /// 旧形式のHUD位置を現在のハイフン区切り表記へ移行する。
+  private static normalizeLegacyPositionValues(): boolean {
+    let hasMigrated = false;
+
+    for (const setting of Object.values(this._instance.paramSettings)) {
+      const paramValues = setting.getParamValues(ParamName.position);
+      if (paramValues[0] === "bottom_center") {
+        paramValues[0] = "bottom-center";
+        setting.setParamValues(ParamName.position, paramValues);
+        hasMigrated = true;
+      }
+    }
+
+    return hasMigrated;
+  }
+
   // 新方法：从后端加载配置（支持自动迁移）
   public static async loadSettingsFromStorage() {
     try {
@@ -742,6 +758,10 @@ export class Settings {
           for (const data of Object.values(Config.paramList)) {
             this.updateParamVisible(index, data.name);
           }
+        }
+
+        if (this.normalizeLegacyPositionValues()) {
+          await this.saveSettingsToStorage();
         }
       }
     } catch (error) {

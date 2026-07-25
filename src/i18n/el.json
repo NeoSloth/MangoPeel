@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "Επάνω αριστερά",
+    "POSITION_TOP_CENTER": "Επάνω στο κέντρο",
+    "POSITION_TOP_RIGHT": "Επάνω δεξιά",
+    "POSITION_MIDDLE_LEFT": "Στο μέσο αριστερά",
+    "POSITION_MIDDLE_RIGHT": "Στο μέσο δεξιά",
+    "POSITION_BOTTOM_LEFT": "Κάτω αριστερά",
+    "POSITION_BOTTOM_CENTER": "Κάτω στο κέντρο",
+    "POSITION_BOTTOM_RIGHT": "Κάτω δεξιά"
+}

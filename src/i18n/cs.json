@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "Vlevo nahoře",
+    "POSITION_TOP_CENTER": "Nahoře uprostřed",
+    "POSITION_TOP_RIGHT": "Vpravo nahoře",
+    "POSITION_MIDDLE_LEFT": "Vlevo uprostřed",
+    "POSITION_MIDDLE_RIGHT": "Vpravo uprostřed",
+    "POSITION_BOTTOM_LEFT": "Vlevo dole",
+    "POSITION_BOTTOM_CENTER": "Dole uprostřed",
+    "POSITION_BOTTOM_RIGHT": "Vpravo dole"
+}

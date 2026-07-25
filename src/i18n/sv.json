@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "Överst till vänster",
+    "POSITION_TOP_CENTER": "Överst i mitten",
+    "POSITION_TOP_RIGHT": "Överst till höger",
+    "POSITION_MIDDLE_LEFT": "Mitten till vänster",
+    "POSITION_MIDDLE_RIGHT": "Mitten till höger",
+    "POSITION_BOTTOM_LEFT": "Nederst till vänster",
+    "POSITION_BOTTOM_CENTER": "Nederst i mitten",
+    "POSITION_BOTTOM_RIGHT": "Nederst till höger"
+}

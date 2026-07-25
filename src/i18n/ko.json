@@ -181,4 +181,13 @@
     "TEXT_OUTLINE_COLOR_DESCRIPTION": "전체 글꼴 윤곽의 색상 설정",
     "FRAMETIME_COLOR_LABEL": "차트 그리기 색상",
     "FRAMETIME_COLOR_DESCRIPTION": "차트에 그려지는 선의 색상 설정"
+,
+    "POSITION_TOP_LEFT": "왼쪽 위",
+    "POSITION_TOP_CENTER": "가운데 위",
+    "POSITION_TOP_RIGHT": "오른쪽 위",
+    "POSITION_MIDDLE_LEFT": "가운데 왼쪽",
+    "POSITION_MIDDLE_RIGHT": "가운데 오른쪽",
+    "POSITION_BOTTOM_LEFT": "왼쪽 아래",
+    "POSITION_BOTTOM_CENTER": "가운데 아래",
+    "POSITION_BOTTOM_RIGHT": "오른쪽 아래"
 }

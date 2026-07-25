@@ -9,6 +9,24 @@ import ResortableList from "./ResortableList";
 import { LocalizationManager, localizeStrEnum } from "../i18n";
 import { ColorPickSlider } from "./ColorPickSlider";
 
+/// HUD位置の設定値と翻訳キーの対応表。
+const positionLabelKeys: Record<string, localizeStrEnum> = {
+  "top-left": localizeStrEnum.POSITION_TOP_LEFT,
+  "top-center": localizeStrEnum.POSITION_TOP_CENTER,
+  "top-right": localizeStrEnum.POSITION_TOP_RIGHT,
+  "middle-left": localizeStrEnum.POSITION_MIDDLE_LEFT,
+  "middle-right": localizeStrEnum.POSITION_MIDDLE_RIGHT,
+  "bottom-left": localizeStrEnum.POSITION_BOTTOM_LEFT,
+  "bottom-center": localizeStrEnum.POSITION_BOTTOM_CENTER,
+  "bottom-right": localizeStrEnum.POSITION_BOTTOM_RIGHT,
+};
+
+/// HUD位置の設定値をローカライズ済みの表示名に変換する。
+const getPositionOptionLabel = (value: string): string => {
+  const labelKey = positionLabelKeys[value];
+  return labelKey ? LocalizationManager.getString(labelKey) : value;
+};
+
 const ParamPatchItem: FC<{ paramName: ParamName, patch: ParamPatch; patchIndex: number}> = ({ paramName, patch, patchIndex}) => {
 
   const [selectedValue, setSelectedValue] = useState(Settings.getParamValue(Settings.getSettingsIndex(),paramName, patchIndex));
@@ -108,13 +126,17 @@ const ParamPatchItem: FC<{ paramName: ParamName, patch: ParamPatch; patchIndex: 
             <DropdownItem
               label={patch.label}
               rgOptions={patch.args.map((x: any, i: number) => {
-                return { data: i, label: x };
+                return {
+                  data: i,
+                  label: paramName === ParamName.position ? getPositionOptionLabel(x) : x,
+                };
               })}
               selectedOption={selectedIndex}
               bottomSeparator={"none"}
-              onChange={(index) => {
-                setSelectedIndex(index.data);
-                updateSettingsValue(index.label);
+              onChange={(option) => {
+                setSelectedIndex(option.data);
+                // 表示名ではなく、既存設定と互換性がある内部値を保存する。
+                updateSettingsValue(patch.args[option.data]);
               }}
             />
             </Focusable>

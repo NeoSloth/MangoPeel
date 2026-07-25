@@ -181,4 +181,13 @@
     "TEXT_OUTLINE_COLOR_DESCRIPTION": "全体のテキストアウトラインの色を設定します",
     "FRAMETIME_COLOR_LABEL": "チャート描画の色",
     "FRAMETIME_COLOR_DESCRIPTION": "チャート内で描画される線の色を設定します"
+,
+    "POSITION_TOP_LEFT": "左上",
+    "POSITION_TOP_CENTER": "上中央",
+    "POSITION_TOP_RIGHT": "右上",
+    "POSITION_MIDDLE_LEFT": "左中央",
+    "POSITION_MIDDLE_RIGHT": "右中央",
+    "POSITION_BOTTOM_LEFT": "左下",
+    "POSITION_BOTTOM_CENTER": "下中央",
+    "POSITION_BOTTOM_RIGHT": "右下"
 }

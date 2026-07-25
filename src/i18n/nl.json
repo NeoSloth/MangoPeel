@@ -1,1 +1,10 @@
-{}
+{
+    "POSITION_TOP_LEFT": "Linksboven",
+    "POSITION_TOP_CENTER": "Boven midden",
+    "POSITION_TOP_RIGHT": "Rechtsboven",
+    "POSITION_MIDDLE_LEFT": "Midden links",
+    "POSITION_MIDDLE_RIGHT": "Midden rechts",
+    "POSITION_BOTTOM_LEFT": "Linksonder",
+    "POSITION_BOTTOM_CENTER": "Onder midden",
+    "POSITION_BOTTOM_RIGHT": "Rechtsonder"
+}
