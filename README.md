@@ -3,7 +3,7 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/Gawah/MangoPeel/total?color=green&logo=github)](https://github.com/Gawah/MangoPeel/releases)
 [![GitHub forks](https://img.shields.io/github/forks/Gawah/MangoPeel?color=green&logo=github)](https://github.com/Gawah/MangoPeel/forks)
 
-[简体中文](README_CN.md) | [English](README.md)
+[简体中文](README_CN.md) | [English](README.md) | [日本語](README_JA.md)
 
 MangoPeel is a Steam Deck plugin used for [decky-loader](https://github.com/SteamDeckHomebrew/decky-loader). It allows users to configure their preferred MangoApp styles to override Steam's default five styles. Its functionality is based on finding the MangoApp configuration file and quickly configuring various MangoApp parameters through a shortcut menu UI, which is then written to the configuration file.
 
