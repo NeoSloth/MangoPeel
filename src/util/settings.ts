@@ -6,7 +6,9 @@ import { prefStore } from './perfStore';
 import { Router } from '@decky/ui';
 import { AppOverviewExt } from './interface';
 
-const SETTINGS_KEY = "MangoPeel";
+const CURRENT_SETTINGS_KEY = "mangopeel_neo";
+const LEGACY_SETTINGS_KEY = "MangoPeel";
+const LEGACY_SETTINGS_MIGRATION_KEY = "mangopeel_neo_legacy_settings_migration_checked";
 const serializer = new JsonSerializer();
 
 type ActiveAppChangedHandler = (newAppId: string, oldAppId: string) => void;
@@ -679,83 +681,135 @@ export class Settings {
     }
   }
 
-  // 改为私有方法，仅用于数据迁移
-  private static loadSettingsFromLocalStorage() {
+  /// 指定したlocalStorageキーから保存済み設定を読み込む。
+  private static loadSettingsFromLocalStorage(key: string) {
     try {
-      const settingsString = localStorage.getItem(SETTINGS_KEY);
+      const settingsString = localStorage.getItem(key);
       if (!settingsString || settingsString === "{}") {
         return null;
       }
       const settingsJson = JSON.parse(settingsString);
       return serializer.deserializeObject(settingsJson, Settings);
     } catch (error) {
-      console.error("Failed to load from localStorage:", error);
+      console.error("[MangoPeel Neo] localStorageから設定を読み込めませんでした:", error);
       return null;
     }
   }
 
-  // 新方法：从后端加载配置（支持自动迁移）
+  /// 保存済み設定が空でないオブジェクトか判定する。
+  private static hasStoredSettings(settings: unknown): settings is Record<string, unknown> {
+    return typeof settings === "object"
+      && settings !== null
+      && !Array.isArray(settings)
+      && Object.keys(settings).length > 0;
+  }
+
+  /// 旧形式のHUD位置を現在のハイフン区切り表記へ移行する。
+  private static normalizeLegacyPositionValues(): boolean {
+    let hasMigrated = false;
+
+    for (const setting of Object.values(this._instance.paramSettings)) {
+      const paramValues = setting.getParamValues(ParamName.position);
+      if (paramValues[0] === "bottom_center") {
+        paramValues[0] = "bottom-center";
+        setting.setParamValues(ParamName.position, paramValues);
+        hasMigrated = true;
+      }
+    }
+
+    return hasMigrated;
+  }
+
+  /// バックエンド、現在のlocalStorage、旧localStorageの順に設定を読み込む。
   public static async loadSettingsFromStorage() {
     try {
-      // 1. 先从后端读取
       const settingsJson = await Backend.getSettings();
       let loadSetting = null;
+      let shouldMarkLegacyMigration = false;
 
-      if (!settingsJson || Object.keys(settingsJson).length === 0) {
-        // 2. 后端无数据，检查 localStorage 旧数据
-        console.log("[MangoPeel] No backend data, checking localStorage...");
-        loadSetting = this.loadSettingsFromLocalStorage();
-        
+      if (this.hasStoredSettings(settingsJson)) {
+        loadSetting = serializer.deserializeObject(settingsJson, Settings);
+        console.log("[MangoPeel Neo] バックエンドから設定を読み込みました");
+      } else {
+        console.log("[MangoPeel Neo] バックエンド設定がないため、localStorageを確認します");
+        loadSetting = this.loadSettingsFromLocalStorage(CURRENT_SETTINGS_KEY);
+
         if (loadSetting) {
-          console.log("[MangoPeel] Found localStorage data, migrating...");
-          // 迁移到后端
-          const settingsJson = serializer.serializeObject(loadSetting);
-          await Backend.setSettings(settingsJson);
-          console.log("[MangoPeel] Migration completed");
+          shouldMarkLegacyMigration = true;
+          console.log("[MangoPeel Neo] 現在のlocalStorage設定を移行します");
+        } else if (localStorage.getItem(LEGACY_SETTINGS_MIGRATION_KEY) !== "true") {
+          loadSetting = this.loadSettingsFromLocalStorage(LEGACY_SETTINGS_KEY);
+
+          if (loadSetting) {
+            shouldMarkLegacyMigration = true;
+            console.log("[MangoPeel Neo] 旧localStorage設定を移行します");
+          } else {
+            try {
+              // 旧キーが存在しない場合は、確認済みであることだけを記録する。
+              localStorage.setItem(LEGACY_SETTINGS_MIGRATION_KEY, "true");
+            } catch (error) {
+              console.warn("[MangoPeel Neo] 旧設定の確認マーカーを保存できませんでした:", error);
+            }
+          }
+        }
+
+        if (loadSetting) {
+          const serializedSettings = serializer.serializeObject(loadSetting);
+          const saved = await Backend.setSettings(serializedSettings);
+          if (!saved) {
+            throw new Error("localStorage設定をバックエンドへ保存できませんでした");
+          }
+
+          if (shouldMarkLegacyMigration) {
+            try {
+              // バックエンドへの保存成功後にのみ、再移行を防ぐマーカーを記録する。
+              localStorage.setItem(LEGACY_SETTINGS_MIGRATION_KEY, "true");
+            } catch (error) {
+              console.warn("[MangoPeel Neo] 旧設定の確認マーカーを保存できませんでした:", error);
+            }
+          }
+          console.log("[MangoPeel Neo] localStorage設定の移行が完了しました");
         } else {
-          console.log("[MangoPeel] No saved settings, using defaults");
+          console.log("[MangoPeel Neo] 保存済み設定がないため、既定値を使用します");
           return;
         }
-      } else {
-        // 3. 后端有数据，直接反序列化
-        loadSetting = serializer.deserializeObject(settingsJson, Settings);
-        console.log("[MangoPeel] Loaded settings from backend");
       }
 
-      // 4. 应用配置
-      if (loadSetting) {
-        this._instance.enabled = loadSetting?.enabled ?? false;
-        this._instance.currentTabRoute = loadSetting?.currentTabRoute ?? "";
-        this._instance.perAppSetting = loadSetting?.perAppSetting ?? {
-          DEFAULT_APP: new perAppSetting(
-            false,
-            prefStore.getSteamIndex() == -1 ? 4 : prefStore.getSteamIndex()
-          )
-        };
-        
-        for (var index = 0; index < 5; index++) {
-          if (loadSetting?.paramSettings?.[index]) {
-            this._instance.paramSettings[index].copyParamSettings(
-              loadSetting.paramSettings[index]
-            );
-          }
-          for (const data of Object.values(Config.paramList)) {
-            this.updateParamVisible(index, data.name);
-          }
+      this._instance.enabled = loadSetting?.enabled ?? false;
+      this._instance.currentTabRoute = loadSetting?.currentTabRoute ?? "";
+      this._instance.perAppSetting = loadSetting?.perAppSetting ?? {
+        DEFAULT_APP: new perAppSetting(
+          false,
+          prefStore.getSteamIndex() == -1 ? 4 : prefStore.getSteamIndex()
+        )
+      };
+
+      for (var index = 0; index < 5; index++) {
+        if (loadSetting?.paramSettings?.[index]) {
+          this._instance.paramSettings[index].copyParamSettings(
+            loadSetting.paramSettings[index]
+          );
+        }
+        for (const data of Object.values(Config.paramList)) {
+          this.updateParamVisible(index, data.name);
         }
       }
+
+      if (this.normalizeLegacyPositionValues()) {
+        await this.saveSettingsToStorage();
+      }
     } catch (error) {
-      console.error("[MangoPeel] Failed to load settings:", error);
+      console.error("[MangoPeel Neo] 設定を読み込めませんでした:", error);
     }
   }
 
-  // 重命名并改为异步方法
+  /// 現在の設定をバックエンドへ保存する。
   public static async saveSettingsToStorage() {
     try {
       const settingsJson = serializer.serializeObject(this._instance);
       await Backend.setSettings(settingsJson);
     } catch (error) {
-      console.error("[MangoPeel] Failed to save settings:", error);
+      console.error("[MangoPeel Neo] 設定を保存できませんでした:", error);
     }
   }
 

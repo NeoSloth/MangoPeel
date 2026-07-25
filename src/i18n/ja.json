@@ -195,5 +195,13 @@
     "REFRESH_RATE_DESCRIPTION": "現在のリフレッシュレートを表示する",
     "GPU_VOLTAGE_LABEL": "GPU電圧",
     "GPU_VOLTAGE_DESCRIPTION": "GPUの電圧を表示する",
-    "RESET_ALL_PARAM_DEFAULT": "すべての設定をリセット"
+    "RESET_ALL_PARAM_DEFAULT": "すべての設定をリセット",
+    "POSITION_TOP_LEFT": "左上",
+    "POSITION_TOP_CENTER": "上中央",
+    "POSITION_TOP_RIGHT": "右上",
+    "POSITION_MIDDLE_LEFT": "左中央",
+    "POSITION_MIDDLE_RIGHT": "右中央",
+    "POSITION_BOTTOM_LEFT": "左下",
+    "POSITION_BOTTOM_CENTER": "下中央",
+    "POSITION_BOTTOM_RIGHT": "右下"
 }

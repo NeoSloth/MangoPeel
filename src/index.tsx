@@ -129,7 +129,7 @@ const Content: FC<{}> = ({ }) => {
 export default definePlugin(() => {
   PluginManager.register();
   return {
-    title: <div className={staticClasses.Title}>MangoPeel</div>,
+    title: <div className={staticClasses.Title}>MangoPeel Neo</div>,
     content: <Content />,
     icon: <FaBorderStyle />,
     onDismount() {

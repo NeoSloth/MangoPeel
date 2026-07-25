@@ -2,6 +2,7 @@
 # For easy intellisense checkout the decky-loader code one directory up
 # or add the `decky-loader/plugin` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import asyncio
+import json
 import os
 import time
 import logging
@@ -11,10 +12,17 @@ import struct
 import sys
 import threading
 import re
+from pathlib import Path
 from ctypes import CDLL, get_errno
 from threading import Thread, Timer
 from settings import SettingsManager
 import decky
+
+CURRENT_CONFIG_FLAG = "mangopeel_neo_flag"
+LEGACY_CONFIG_FLAG = "mangopeel_flag"
+SETTINGS_KEY = "settings"
+LEGACY_SETTINGS_MIGRATION_KEY = "mangopeel_neo_legacy_settings_migration_checked"
+LEGACY_SETTINGS_DIRECTORY = "MangoPeel"
 
 IN_ACCESS        = 0x00000001  # 文件被访问
 IN_MODIFY        = 0x00000002  # 文件被修改
@@ -52,10 +60,10 @@ STEAM_CONFIG=[
     ]
 ]
 
-#日志配置
+# Decky Loader が管理するプラグイン専用ログへ出力する。
 logging.basicConfig(
     level = logging.DEBUG,
-    filename = "/tmp/MangoPeel.log",
+    filename = getattr(decky, "DECKY_PLUGIN_LOG", None) or "/tmp/MangoPeel-Neo.log",
     format="[%(asctime)s | %(filename)s:%(lineno)s:%(funcName)s] %(levelname)s: %(message)s",
     filemode = 'w',
     force = True
@@ -249,42 +257,67 @@ class MangoPeel:
         except Exception as e:
             logging.error(e)
 
+    def _parseConfigFlag(self, config: str):
+        """MangoPeel系の設定識別子から有効なSteam設定添字を取得する。"""
+        if not config:
+            return None
+
+        first_line = config.splitlines()[0]
+        match = re.fullmatch(
+            rf"(?:{re.escape(CURRENT_CONFIG_FLAG)}|{re.escape(LEGACY_CONFIG_FLAG)})=([0-4])",
+            first_line
+        )
+        if not match:
+            return None
+        return int(match.group(1))
+
     def overWriteConfig(self):
         try:
             if not self._findConfig:
                 return
             nowConfig = open(self._configPath, "r").read().strip()
-            #没有mangopeel的标签 则查找是否是steam写入的配置 并记录下标
-            if not nowConfig.startswith("mangopeel_flag"):
+            config_flag_index = self._parseConfigFlag(nowConfig)
+
+            if nowConfig.startswith((CURRENT_CONFIG_FLAG, LEGACY_CONFIG_FLAG)):
+                if config_flag_index is None:
+                    # 不正な識別子から前回の添字で上書きしないよう、無効化する。
+                    self._steamIndex = -1
+                    logging.warning("MangoPeel設定の識別子を取得できませんでした")
+                else:
+                    self._steamIndex = config_flag_index
+                    self._bmangoapp_steam = "mangoapp_steam" in nowConfig.splitlines()
+                    logging.debug(f"識別到steam下標={self._steamIndex} 是否写入mangoapp_steam={self._bmangoapp_steam}")
+            else:
+                # 外部の任意設定を以前の添字で上書きしないよう、判定前に無効化する。
+                self._steamIndex = -1
+                self._bmangoapp_steam = True
+                found_steam_config = False
                 for index in range(len(STEAM_CONFIG)):
                     if nowConfig in STEAM_CONFIG[index]:
                         self._steamIndex=index
                         self._bmangoapp_steam=True
-                        logging.debug(f"识别到steam下标={self._steamIndex} 是否写入mangoapp_steam={self._bmangoapp_steam}")
+                        found_steam_config = True
+                    else:
+                        for config in STEAM_CONFIG[index]:
+                            if config.replace("mangoapp_steam\n","") == nowConfig:
+                                self._steamIndex=index
+                                self._bmangoapp_steam=False
+                                found_steam_config = True
+                                break
+                    if found_steam_config:
+                        logging.debug(f"識別到steam下標={self._steamIndex} 是否写入mangoapp_steam={self._bmangoapp_steam}")
                         break
-                    for config in STEAM_CONFIG[index]:    
-                        if config.replace("mangoapp_steam\n","") == nowConfig:
-                            self._steamIndex=index
-                            self._bmangoapp_steam=False
-                            logging.debug(f"识别到steam下标={self._steamIndex} 是否写入mangoapp_steam={self._bmangoapp_steam}")
-                            break
-            else:
-                match = re.search(r"mangopeel_flag=(\d+)", nowConfig)
-                if match:
-                    self._steamIndex = int(match.group(1))
-                    self._bmangoapp_steam = nowConfig.find("mangoapp_steam") != -1
-                    logging.debug(f"识别到steam下标={self._steamIndex} 是否写入mangoapp_steam={self._bmangoapp_steam}")
-                
-            if not self._findConfig or self._steamIndex<0 or self._setConfigList[self._steamIndex] == "":
+
+            if not self._findConfig or not 0 <= self._steamIndex <= 4 or self._setConfigList[self._steamIndex] == "":
                 return
             if self._bmangoapp_steam:
-                writeStr = (f"mangopeel_flag={self._steamIndex}\nmangoapp_steam\n" + self._setConfigList[self._steamIndex])
+                writeStr = (f"{CURRENT_CONFIG_FLAG}={self._steamIndex}\nmangoapp_steam\n" + self._setConfigList[self._steamIndex])
             else:
-                writeStr = f"mangopeel_flag={self._steamIndex}\n" + self._setConfigList[self._steamIndex]
+                writeStr = f"{CURRENT_CONFIG_FLAG}={self._steamIndex}\n" + self._setConfigList[self._steamIndex]
 
             if writeStr.replace("\n","")!= nowConfig.replace("\n",""):
                 open(self._configPath, "w").write(writeStr)
-                logging.debug(f"写入配置 steam下标={self._steamIndex} 配置为:\n{writeStr}")
+                logging.debug(f"写入配置 steam下標={self._steamIndex} 配置为:\n{writeStr}")
         except Exception as e:
             logging.error(e)
 
@@ -342,31 +375,75 @@ class Plugin:
             logging.error(e)
             return "main"
 
+    def _migrate_legacy_settings(self):
+        """旧 MangoPeel の設定を新しい設定領域へ一度だけ移行する。"""
+        try:
+            if self.settings.getSetting(LEGACY_SETTINGS_MIGRATION_KEY):
+                logging.debug("旧設定の移行確認は完了しています")
+                return
+
+            current_settings = self.settings.getSetting(SETTINGS_KEY)
+            if isinstance(current_settings, dict) and current_settings:
+                self.settings.setSetting(LEGACY_SETTINGS_MIGRATION_KEY, True)
+                logging.debug("新しい設定領域に既存設定があるため、旧設定を移行しません")
+                return
+        except Exception as error:
+            logging.warning(f"新しい設定領域を確認できませんでした: {error}")
+            return
+
+        try:
+            legacy_config_path = (
+                Path(decky.DECKY_HOME)
+                / "settings"
+                / LEGACY_SETTINGS_DIRECTORY
+                / "config.json"
+            )
+            # 旧ファイルは読み取り専用で開き、内容の変更や削除は行わない。
+            with legacy_config_path.open("r", encoding="utf-8") as legacy_config_file:
+                legacy_config = json.load(legacy_config_file)
+            legacy_settings = legacy_config.get(SETTINGS_KEY) if isinstance(legacy_config, dict) else None
+            if isinstance(legacy_settings, dict) and legacy_settings:
+                self.settings.setSetting(SETTINGS_KEY, legacy_settings)
+                logging.info("旧 MangoPeel 設定を MangoPeel Neo へ移行しました")
+            else:
+                logging.debug("移行可能な旧 MangoPeel 設定はありません")
+        except (OSError, json.JSONDecodeError) as error:
+            logging.warning(f"旧 MangoPeel 設定を読み込めませんでした: {error}")
+        except Exception as error:
+            logging.warning(f"旧 MangoPeel 設定を移行できませんでした: {error}")
+        finally:
+            try:
+                # 旧設定の確認後は結果にかかわらず再確認を防ぐマーカーを保存する。
+                self.settings.setSetting(LEGACY_SETTINGS_MIGRATION_KEY, True)
+            except Exception as error:
+                logging.warning(f"旧設定移行の確認マーカーを保存できませんでした: {error}")
+
     async def get_settings(self):
-        """Get plugin settings from file system"""
-        return self.settings.getSetting("settings")
+        """プラグイン設定を取得する。"""
+        return self.settings.getSetting(SETTINGS_KEY)
 
     async def set_settings(self, settings):
-        """Save plugin settings to file system"""
-        self.settings.setSetting("settings", settings)
-        logging.debug(f"Saved settings: {settings}")
+        """プラグイン設定を保存する。"""
+        self.settings.setSetting(SETTINGS_KEY, settings)
+        logging.debug(f"設定を保存しました: {settings}")
         return True
-    
-    
-    # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
+
+
+    # プラグイン読み込み時にタスクとして実行される長時間処理。
     async def _main(self):
-        # Initialize SettingsManager
+        # 新しいプラグイン名に対応する設定領域を初期化する。
         self.settings = SettingsManager(
             name="config",
             settings_directory=decky.DECKY_PLUGIN_SETTINGS_DIR
         )
-        
-        logging.info("Running MangoPeel!")
+        self._migrate_legacy_settings()
+
+        logging.info("MangoPeel Neo を起動しました")
         self._mango=MangoPeel()
         self._mango.register()
 
-    # Function called first during the unload process, utilize this to handle your plugin being removed
+    # プラグインのアンロード時に最初に呼び出される。
     async def _unload(self):
         self._mango.unregister()
-        logging.info("End MangoPeel!")
-        pass 
+        logging.info("MangoPeel Neo を終了しました")
+        pass

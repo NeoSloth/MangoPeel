@@ -30,7 +30,7 @@ export const MangoIndex: FC = () => {
   },[])
   return (
         <div>
-          <div id="MangoPeel_IndexSlider">
+          <div id="MangoPeelNeo_IndexSlider">
           <PanelSectionRow>
             <SliderField
               label={LocalizationManager.getString(localizeStrEnum.MANGOINDEX_LABEL)}
@@ -46,6 +46,7 @@ export const MangoIndex: FC = () => {
               ]}
               disabled={disabledSlider}
               notchCount={5}
+              notchTicksVisible={false}
               value={index}
               onChange={(value)=>{
                 setIndex(value);
@@ -99,19 +100,6 @@ export const MangoIndex: FC = () => {
             }}
             />
           </PanelSectionRow>
-          {
-            disabledSlider&&
-            <style>
-            {
-              //底部标签置为灰色
-              `#MangoPeel_IndexSlider
-              .gamepadslider_SliderNotchTick_Fv1Ht.gamepadslider_TickActive_1gnUV {
-                  background-color: #8b929a!important;
-                  background: #8b929a!important;
-              }`
-            }
-          </style>
-          }
         </div>
     );
 };

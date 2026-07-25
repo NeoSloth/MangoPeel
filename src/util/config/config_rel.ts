@@ -84,7 +84,7 @@ export const paramList:{ [paramName: string]: ParamData }={
       },
       patchs:[{
           type:ParamPatchType.dropdown,
-          args:["top-left","top-center","top-right","middle-left","middle-right","bottom-left","bottom_center","bottom-right"],
+          args:["top-left","top-center","top-right","middle-left","middle-right","bottom-left","bottom-center","bottom-right"],
           defaultValue:"top-left"
       }]
   },
@@ -274,7 +274,7 @@ export const paramList:{ [paramName: string]: ParamData }={
       patchs: [{
         type: ParamPatchType.textInput,
         args: [],
-        defaultValue: "MangoPeel",
+        defaultValue: "MangoPeel Neo",
       }]
   },
 
