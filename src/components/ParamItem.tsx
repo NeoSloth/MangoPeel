@@ -56,41 +56,19 @@ const ParamPatchItem: FC<{ paramName: ParamName, patch: ParamPatch; patchIndex: 
   switch (patch.type) {
     case ParamPatchType.slider:
       return (
-        <>
-          {/* @ts-ignore */}
-          <PanelSectionRow id="MangoPeel_Slider">
-              <SlowSliderField
-              min={patch.args[0]}
-              max={patch.args[1]}
-              step={patch.args[2]}
-              showValue={true}
-              value={selectedValue}
-              layout={"inline"}
-              bottomSeparator={"none"}
-              onChangeEnd={updateSettingsValue}
-              resetValue={Settings.getDefaultParam(Settings.getSettingsIndex(),paramName)?.paramValues[patchIndex]}
-              />
-          </PanelSectionRow>
-          <style>
-            {
-              //缩短滑动条
-              `#MangoPeel_Slider
-              .gamepaddialog_Field_S-_La.gamepaddialog_ChildrenWidthFixed_1ugIU 
-              .gamepaddialog_FieldChildrenWithIcon_2ZQ9w{
-                min-width: 215px!important;
-              } `
-            }
-            {
-              //调整标签位置
-              `#MangoPeel_Slider 
-              .gamepadslider_DescriptionValue_2oRwF {
-                width: 43px;
-                margin-left: 0;
-                flex-direction: column;
-              }`
-            }
-          </style>
-        </>
+        <PanelSectionRow>
+          <SlowSliderField
+            min={patch.args[0]}
+            max={patch.args[1]}
+            step={patch.args[2]}
+            showValue={true}
+            value={selectedValue}
+            layout={"below"}
+            bottomSeparator={"none"}
+            onChangeEnd={updateSettingsValue}
+            resetValue={Settings.getDefaultParam(Settings.getSettingsIndex(),paramName)?.paramValues[patchIndex]}
+          />
+        </PanelSectionRow>
       );
     case ParamPatchType.notchSlider:
       return (
