@@ -30,7 +30,7 @@ const Content: FC<{}> = ({ }) => {
       return {
         title: groupName,
         id: groupName,
-        content: <div style={{ marginLeft: "-10px", marginRight: "-10px" }}>
+        content: <div style={{ marginLeft: "-2.8vw", marginRight: "-2.8vw" }}>
           <PanelSection>
             {groupItem.map((paramData) => {
               return (
@@ -106,6 +106,7 @@ const Content: FC<{}> = ({ }) => {
           style={{
             height: "95%",
             width: "calc(100vw - 50px)",
+            maxWidth: "100%",
             marginTop: "-12px",
             position: "absolute",
             contain: "layout style paint",
@@ -128,7 +129,7 @@ const Content: FC<{}> = ({ }) => {
 export default definePlugin(() => {
   PluginManager.register();
   return {
-    title: <div className={staticClasses.Title}>MangoPeel</div>,
+    title: <div className={staticClasses.Title}>MangoPeel Neo</div>,
     content: <Content />,
     icon: <FaBorderStyle />,
     onDismount() {
